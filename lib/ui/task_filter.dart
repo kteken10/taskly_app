@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
+import '../l10n/app_localizations.dart';
 import 'add_taskbutton.dart'; // Import du bouton
 
-enum TaskFilter { All, NotStarted, Started, Completed, Overdue }
+enum TaskFilter { all, notStarted, started, completed, overdue }
 
 class TaskFilterBar extends StatefulWidget {
   final TaskFilter selectedFilter;
@@ -31,12 +32,13 @@ class _TaskFilterBarState extends State<TaskFilterBar> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
     final filters = {
-      TaskFilter.All: "All",
-      TaskFilter.NotStarted: "Not Started",
-      TaskFilter.Started: "In Progress",
-      TaskFilter.Completed: "Completed",
-      TaskFilter.Overdue: "Overdue",
+      TaskFilter.all: localizations.all,
+      TaskFilter.notStarted: localizations.notStarted,
+      TaskFilter.started: localizations.inProgress,
+      TaskFilter.completed: localizations.completed,
+      TaskFilter.overdue: localizations.overdue,
     };
 
     return Padding(
@@ -49,7 +51,7 @@ class _TaskFilterBarState extends State<TaskFilterBar> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "Filter Tasks:",
+                localizations.filterTasks,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -79,7 +81,7 @@ class _TaskFilterBarState extends State<TaskFilterBar> {
                               borderRadius: BorderRadius.all(Radius.circular(12.0)),
                               borderSide: BorderSide(color: Colors.white),
                             ),
-                            hintText: 'Search by name...',
+                            hintText: localizations.search,
                             fillColor: Colors.white,
                             filled: true,
                             border: OutlineInputBorder(
@@ -140,7 +142,7 @@ class _TaskFilterBarState extends State<TaskFilterBar> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppColors.secondary.withOpacity(0.2)
+                            ? AppColors.secondary.withValues(alpha: 0.2)
                             : AppColors.white,
                         borderRadius: BorderRadius.circular(16),
                       ),

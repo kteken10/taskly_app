@@ -1,6 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/foundation.dart';
 import '../model/task.dart';
 
 class NotificationService {
@@ -16,12 +17,15 @@ class NotificationService {
     await _setupTimeZones();
     await _initializeNotificationPlugin();
     await _createNotificationChannel();
+    await _android?.requestNotificationsPermission();
   }
 
+  static AndroidFlutterLocalNotificationsPlugin? get _android => _notificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
   static Future<void> _setupTimeZones() async {
+    // Les échéances sont converties en instants UTC : le fuseau de l'appareil n'a pas d'importance.
     tz.initializeTimeZones();
-    final location = tz.getLocation('Europe/Paris'); // Ajustez selon votre fuseau
-    tz.setLocalLocation(location);
   }
 
   static Future<void> _initializeNotificationPlugin() async {
@@ -49,10 +53,7 @@ class NotificationService {
       showBadge: true,
     );
 
-    await _notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
+    await _android?.createNotificationChannel(channel);
   }
 
   static void _onNotificationTap(NotificationResponse notificationResponse) {
@@ -63,26 +64,24 @@ class NotificationService {
   static Future<void> scheduleTaskNotification(Task task) async {
     try {
       final scheduledDate = _getNotificationTime(task.deadline);
-      
+      if (scheduledDate.isBefore(DateTime.now())) return;
       await _notificationsPlugin.zonedSchedule(
         task.id.hashCode,
-        'Rappel de tâche',
-        'La tâche "${task.title}" approche de son échéance!',
+        'Task reminder',
+        '"${task.title}" is due in one hour.',
         scheduledDate,
         _buildNotificationDetails(),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-       
-        matchDateTimeComponents: DateTimeComponents.dateAndTime,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         payload: task.id, // Peut être utilisé pour naviguer vers la tâche
       );
     } catch (e) {
-      print('Erreur lors de la planification de la notification: $e');
+      debugPrint('Erreur lors de la planification de la notification: $e');
     }
   }
 
   static tz.TZDateTime _getNotificationTime(DateTime deadline) {
     final notificationTime = deadline.subtract(const Duration(hours: 1));
-    return tz.TZDateTime.from(notificationTime, tz.local);
+    return tz.TZDateTime.from(notificationTime, tz.UTC);
   }
 
   static NotificationDetails _buildNotificationDetails() {

@@ -9,7 +9,7 @@ class ThemeNotifier extends StateNotifier<ThemeData> {
   ThemeNotifier() : super(_lightTheme);
 
   static final _lightTheme = ThemeData.light().copyWith(
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 2,
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     ),
@@ -20,7 +20,7 @@ class ThemeNotifier extends StateNotifier<ThemeData> {
   );
 
   static final _darkTheme = ThemeData.dark().copyWith(
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     ),

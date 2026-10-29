@@ -56,7 +56,7 @@ class _PulsingAvatarState extends State<PulsingAvatar>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               // ignore: deprecated_member_use
-              color: Colors.green.withOpacity(opacity * 0.3),
+              color: Colors.green.withValues(alpha: opacity * 0.3),
             ),
           );
         },

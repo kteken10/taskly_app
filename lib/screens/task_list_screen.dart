@@ -22,7 +22,7 @@ class TaskListScreen extends ConsumerStatefulWidget {
 }
 
 class _TaskListScreenState extends ConsumerState<TaskListScreen> {
-  TaskFilter _filter = TaskFilter.All;
+  TaskFilter _filter = TaskFilter.all;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -169,17 +169,16 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
     final now = DateTime.now();
     return tasks.where((task) {
       switch (filter) {
-        case TaskFilter.All:
+        case TaskFilter.all:
           return true;
-        case TaskFilter.NotStarted:
+        case TaskFilter.notStarted:
           return task.status == TaskStatus.NotStarted;
-        case TaskFilter.Started:
+        case TaskFilter.started:
           return task.status == TaskStatus.Started;
-        case TaskFilter.Completed:
+        case TaskFilter.completed:
           return task.status == TaskStatus.Completed;
-        case TaskFilter.Overdue:
-          return task.status != TaskStatus.Completed &&
-              task.deadline.isBefore(now);
+        case TaskFilter.overdue:
+          return task.isOverdueAt(now);
       }
     }).toList();
   }

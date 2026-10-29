@@ -4,9 +4,7 @@ import '../model/task.dart';
 import '../providers/task_provider.dart';
 import '../l10n/app_localizations.dart';
 import '../services/analytics_service.dart';
-import '../services/notification_service.dart';
 // ignore: depend_on_referenced_packages
-import 'package:intl/intl.dart';
 
 class TaskCard extends ConsumerWidget {
   final Task task;
@@ -19,7 +17,7 @@ class TaskCard extends ConsumerWidget {
     final localizations = AppLocalizations.of(context);
 
     return Card(
-      color: Colors.white,
+      color: theme.cardColor,
       margin: const EdgeInsets.symmetric(vertical: 4),
       elevation: 0,
       child: Container(
@@ -73,7 +71,7 @@ class TaskCard extends ConsumerWidget {
   Color _getStatusBorderColor(TaskStatus status) {
     switch (status) {
       case TaskStatus.NotStarted:
-        return const Color.fromARGB(255, 180, 178, 178).withOpacity(0.5);
+        return const Color.fromARGB(255, 180, 178, 178).withValues(alpha: 0.5);
       case TaskStatus.Started:
         return Colors.blue;
       case TaskStatus.Completed:
@@ -137,17 +135,23 @@ class _TitleSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (task.highPriority)
           Icon(Icons.warning, color: Colors.red, size: 16),
-        Text(
-          task.title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.primary,
-            decoration: TextDecoration.underline,
+        Flexible(
+          child: Text(
+            task.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+              decoration: TextDecoration.underline,
+            ),
           ),
         ),
+        const SizedBox(width: 8),
       ],
     );
   }
@@ -164,22 +168,26 @@ class _StatusSection extends StatelessWidget {
     required this.onEditDeadline,
   });
 
-  Color _getTimeStatusColor() {
-    if (task.status == TaskStatus.Completed) return Colors.green;
-    if (task.timeStatus.contains('Overdue')) return Colors.red;
-    if (task.timeStatus.contains('Due in')) return Colors.orange;
-    return theme.colorScheme.onSurface;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+    final now = DateTime.now();
+    final days = task.daysUntilDeadline(now);
+    final (label, color) = task.status == TaskStatus.Completed
+        ? (localizations.completedOn(task.deadline), Colors.green)
+        : task.isOverdueAt(now)
+            ? (localizations.overdueBy(now.difference(task.deadline)), Colors.red)
+            : days == 0
+                ? (localizations.dueToday, theme.colorScheme.onSurface)
+                : (localizations.dueInDays(days), Colors.orange);
+
     return Row(
       children: [
         Text(
-          task.timeStatus,
+          label,
           style: theme.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: _getTimeStatusColor(),
+            color: color,
           ),
         ),
         if (task.status != TaskStatus.Completed)
@@ -188,7 +196,7 @@ class _StatusSection extends StatelessWidget {
             onPressed: onEditDeadline,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            tooltip: 'Modifier échéance',
+            tooltip: AppLocalizations.of(context).editDeadline,
           ),
       ],
     );
@@ -230,7 +238,7 @@ class _StartDateSection extends StatelessWidget {
     return Row(
       children: [
         Text(
-          'Start: ${DateFormat('MMM d').format(task.startDate)}',
+          AppLocalizations.of(context).startOn(task.startDate),
           style: theme.textTheme.bodySmall,
         ),
         // On peut modifier la date de début uniquement si la tâche n'a pas encore démarré
@@ -240,7 +248,7 @@ class _StartDateSection extends StatelessWidget {
             onPressed: onEditStartDate,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            tooltip: 'Modifier date de démarrage',
+            tooltip: AppLocalizations.of(context).editStartDate,
           ),
       ],
     );
@@ -266,7 +274,7 @@ class _AssignedSection extends StatelessWidget {
           Text('•', style: TextStyle(color: Colors.grey)),
         if (task.highPriority)
           Text(
-            'High Priority',
+            AppLocalizations.of(context).highPriority,
             style: theme.textTheme.bodySmall?.copyWith(color: Colors.red),
           ),
       ],
@@ -307,7 +315,6 @@ class _ActionSection extends StatelessWidget {
               onPressed: () {
                 ref.read(taskProvider.notifier).updateTaskStatus(task.id, TaskStatus.Completed);
                 AnalyticsService.logTaskEvent('complete_task', task);
-                NotificationService.cancelNotification(task);
               },
             ),
             const SizedBox(width: 4),
@@ -330,7 +337,6 @@ class _ActionSection extends StatelessWidget {
           onPressed: () {
             ref.read(taskProvider.notifier).updateTaskStatus(task.id, TaskStatus.Started);
             AnalyticsService.logTaskEvent('reopen_task', task);
-            NotificationService.scheduleTaskNotification(task.copyWith(status: TaskStatus.Started));
           },
         );
     }

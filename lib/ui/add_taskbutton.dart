@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class AddTaskButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -16,7 +17,7 @@ class AddTaskButton extends StatelessWidget {
       child: IconButton(
         icon: const Icon(Icons.add, color: Colors.white),
         onPressed: onPressed,
-        tooltip: 'Ajouter une tâche',
+        tooltip: AppLocalizations.of(context).addTask,
       ),
     );
   }

@@ -1,5 +1,5 @@
-name: taskmanagerui
-description: "A new Flutter project."
+name: taskly
+description: "Task manager in Flutter with Riverpod, Hive, reminders, French and English, light and dark themes."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -41,9 +41,8 @@ dependencies:
   hive: ^2.2.3
  
   hive_flutter: ^1.1.0
-  build_runner: ^2.4.15
-  hive_generator: ^2.0.1
-  flutter_flag_selector: ^0.0.1
+  intl: ^0.20.3
+  timezone: ^0.10.1
 
 dev_dependencies:
   flutter_test:

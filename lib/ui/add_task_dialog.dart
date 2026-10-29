@@ -45,7 +45,7 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: AppColors.primary.withOpacity(0.1),
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             child: Icon(Icons.task, color: AppColors.primary, size: 24),
           ),
           const SizedBox(height: 8),
@@ -63,19 +63,10 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4),
-              child: Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(text: "Remplissez les "),
-                    TextSpan(
-                      text: "détails",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    TextSpan(text: " de la tâche"),
-                  ],
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                localizations.addTaskSubtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black87,
@@ -99,7 +90,7 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
             const SizedBox(height: 12),
             _buildInputField(
               controller: _assignedToController,
-              label: 'Assigné à',
+              label: localizations.assignedTo,
               icon: Icons.person,
             ),
             const SizedBox(height: 12),
@@ -117,7 +108,7 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
             foregroundColor: Colors.grey,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
-          child: const Text('Annuler'),
+          child: Text(localizations.cancel),
         ),
         ElevatedButton.icon(
           icon: const Icon(Icons.add_task, size: 16, color: Colors.white),
@@ -219,8 +210,8 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
           children: [
             Icon(Icons.priority_high, color: AppColors.primary, size: 18),
             const SizedBox(width: 8),
-            const Text(
-              'Haute priorité',
+            Text(
+              AppLocalizations.of(context).highPriority,
               style: TextStyle(fontSize: 14),
             ),
             const Spacer(),
@@ -260,8 +251,8 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
   void _createTask(WidgetRef ref, BuildContext context) {
     if (_titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Le titre est requis'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).titleRequired),
           behavior: SnackBarBehavior.floating,
           margin: EdgeInsets.all(8),
         ),

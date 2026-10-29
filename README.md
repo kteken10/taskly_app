@@ -1,118 +1,52 @@
-# 📋 Task Manager App
+# Taskly
 
-A Flutter task management application, multilingual and with dark mode support, developed using **Riverpod** for state management and **Hive** for local storage.
+<p align="center"><img src="docs/banner.png" alt="Taskly: task manager built with Flutter" width="100%"></p>
 
----
+![Flutter](https://img.shields.io/badge/Flutter-3-02569B?logo=flutter&logoColor=white)
+![Riverpod](https://img.shields.io/badge/state-Riverpod-5A3D80)
+![Hive](https://img.shields.io/badge/storage-Hive-FFB300)
+![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20iOS-0A2540)
 
-## ✨ Features
+A task manager that keeps you on schedule: deadlines that tell you how much time is left, a reminder one hour before each one, and everything stored on the device.
 
-- **Complete Task Management**
-  - Create, edit, delete tasks
-  - Track status: `NotStarted`, `Started`, `Completed`
-  - Set start and end dates
-  - Task prioritization
-  - Drag-and-drop reordering
-- **Filters and Search**
-  - Filter by status (All, Not Started, In Progress, Completed, Overdue)
-  - Search by title or description
-- **Internationalization**
-  - English 🇬🇧 and French 🇫🇷
-  - Switch language instantly
-- **Themes**
-  - Light 🌞 and dark 🌙 mode
-  - One-click theme switching
-- **Smooth UI**
-  - Animations for theme and language changes
-  - Animated reorderable task list
-- **Local Storage**
-  - Data persistence via **Hive**
-  - Automatic save after each change
+## Screens
 
----
+<p align="center"><img src="docs/tour.gif" width="260" alt="Tour of the app: task list, overdue filter, new task, dark mode, French"></p>
 
-## 📂 Project Structure
+| Tasks | Overdue | New task | Dark mode | French |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="docs/screens/tasks.png" width="150" alt="Task list"> | <img src="docs/screens/overdue-filter.png" width="150" alt="Overdue filter"> | <img src="docs/screens/new-task.png" width="150" alt="New task dialog"> | <img src="docs/screens/dark-mode.png" width="150" alt="Dark mode"> | <img src="docs/screens/french.png" width="150" alt="French interface"> |
+
+## Features
+
+- **Tasks** with a description, assignee, start date, deadline and a high-priority flag.
+- **Status flow**: not started, in progress, completed, with undo and reopen.
+- **Time left at a glance**: due today, due tomorrow, due in N days, overdue by how long.
+- **Filters** (all, not started, in progress, completed, overdue) and search by name.
+- **Reorder** by drag and drop, **swipe to delete** with confirmation.
+- **Reminders**: a notification one hour before the deadline, rescheduled when the deadline changes and cancelled when the task is completed or deleted.
+- **English and French**, **light and dark themes**, switchable from the app bar.
+- **Offline**: tasks are saved on the device with Hive; sample tasks on first launch.
+
+## How it is built
 
 ```
 lib/
-│
-├── model/
-│   └── task.dart          # Task data model + TaskStatus enum
-│
-├── providers/
-│   ├── task_provider.dart   # Task list management with Riverpod
-│   ├── theme_provider.dart  # Light/dark theme management
-│   └── locale_provider.dart # Language management
-│
-├── screens/
-│   └── task_list_screen.dart # Main screen displaying the task list
-│
-├── services/
-│   └── hive_service.dart   # Hive storage management (not included here)
-│
-├── ui/
-│   ├── pulsing_avatar.dart   # Animated avatar (online status)
-│   ├── reorderable_task_list.dart # Reorderable task list
-│   ├── task_filter.dart      # Filter bar + search
-│   └── add_task_dialog.dart  # Dialog to add a task
-│
-└── l10n/
-    └── app_localizations.dart # Localization files
+├── model/        Task and TaskStatus, Hive adapters (task.g.dart)
+├── providers/    Riverpod notifiers: tasks, theme, locale
+├── services/     Hive storage, local notifications, event log
+├── screens/      task list screen and filtering
+├── ui/           task card, filter bar, add dialog, reorderable list
+└── l10n/         English and French strings
+test/             model and sample data tests
 ```
 
----
+The task notifier is the single place that changes tasks: it saves to Hive and keeps the matching reminder in sync, so the widgets only call it.
 
-## 🛠️ Technologies Used
+## Getting started
 
-- **[Flutter](https://flutter.dev/)**
-- **[Riverpod](https://riverpod.dev/)**
-- **[Hive](https://docs.hivedb.dev/#/)**
-- **[intl](https://pub.dev/packages/intl)** for date management
-- **ReorderableListView** for task reordering
-- **Flutter localization** for multilingual support
-
----
-
-## 🚀 Installation
-
-1. **Clone the project**
-   ```bash
-   git clone https://github.com/kteken10/taskmanagerui
-   cd task-manager-app
-   ```
-
-2. **Install dependencies**
-   ```bash
-   flutter pub get
-   ```
-
-3. **Generate Hive adapters**
-   ```bash
-   flutter packages pub run build_runner build
-   ```
-
-4. **Run the application**
-   ```bash
-   flutter run
-   ```
-
----
-
-## 📖 Usage
-
-- Press the **+** button to add a new task
-- Use the **filter bar** to sort by status
-- Click the 🌙 / 🌞 icon to switch theme
-- Click the 🌐 icon to change language
-- Long press and drag a task to reorder
-
----
-
-## 📸 Screenshots
-
-*(Add screenshots of the application here)*
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+flutter pub get
+flutter run
+flutter test
+```

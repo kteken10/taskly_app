@@ -1,4 +1,5 @@
 // lib/services/analytics_service.dart
+import 'package:flutter/foundation.dart';
 import '../model/task.dart';
 
 class AnalyticsService {
@@ -27,9 +28,9 @@ class AnalyticsService {
 
   // Option 1: Affichage dans la console
   static void _printEvent(Map<String, dynamic> event) {
-    print('🔔 Événement analytique:');
+    debugPrint('🔔 Événement analytique:');
     event.forEach((key, value) {
-      print('   $key: $value');
+      debugPrint('   $key: $value');
     });
   }
 

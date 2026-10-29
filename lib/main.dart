@@ -24,7 +24,7 @@ class MyApp extends ConsumerWidget {
     final locale = ref.watch(localeProvider);
 
     return MaterialApp(
-      title: 'Task Manager',
+      title: 'Taskly',
       theme: theme,
       locale: locale,
       localizationsDelegates: [

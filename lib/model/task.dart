@@ -66,22 +66,14 @@ class Task {
   String get formattedDeadline => DateFormat('yyyy-MM-dd').format(deadline);
   String get formattedStartDate => DateFormat('yyyy-MM-dd').format(startDate);
 
-  String get timeStatus {
-    final now = DateTime.now();
-    if (status == TaskStatus.Completed) {
-      return 'Completed: ${DateFormat('MMM d').format(deadline)}';
-    } else if (deadline.isBefore(now)) {
-      final difference = now.difference(deadline);
-      return 'Overdue - ${difference.inHours}h ${difference.inMinutes % 60}m';
-    } else {
-      final difference = deadline.difference(now);
-      if (difference.inDays > 0) {
-        return 'Due in ${difference.inDays} days';
-      } else {
-        return 'Due Today';
-      }
-    }
-  }
+  /// True when the deadline has passed and the task is not completed.
+  bool isOverdueAt(DateTime now) => status != TaskStatus.Completed && deadline.isBefore(now);
+
+  /// Calendar days between [now] and the deadline: 0 today, 1 tomorrow.
+  int daysUntilDeadline(DateTime now) =>
+      DateTime(deadline.year, deadline.month, deadline.day)
+          .difference(DateTime(now.year, now.month, now.day))
+          .inDays;
 }
 
 @HiveType(typeId: 1)

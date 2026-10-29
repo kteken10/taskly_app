@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/task.dart';
 import '../services/hive_service.dart';
+import '../services/notification_service.dart';
 
 final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>((ref) {
   return TaskNotifier();
@@ -12,6 +13,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   void addTask(Task task) {
     state = [...state, task];
     _saveToHive();
+    NotificationService.updateTaskNotification(task);
   }
 
   void updateTaskStatus(String taskId, TaskStatus newStatus) {
@@ -27,6 +29,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
       return task;
     }).toList();
     _saveToHive();
+    _syncReminder(taskId);
   }
 
   void updateDeadline(String taskId, DateTime newDeadline) {
@@ -35,6 +38,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
       return task;
     }).toList();
     _saveToHive();
+    _syncReminder(taskId);
   }
 
   void updateStartDate(String taskId, DateTime newStartDate) {
@@ -46,15 +50,26 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   }
 
   void deleteTask(String taskId) {
+    for (final task in state.where((task) => task.id == taskId)) {
+      NotificationService.cancelNotification(task);
+    }
     state = state.where((task) => task.id != taskId).toList();
     _saveToHive();
   }
 
+  /// [newIndex] is the final position, already adjusted for the removed item.
   void reorderTasks(int oldIndex, int newIndex) {
-    if (newIndex > oldIndex) newIndex--;
-    final task = state.removeAt(oldIndex);
-    state.insert(newIndex, task);
+    final tasks = [...state];
+    tasks.insert(newIndex, tasks.removeAt(oldIndex));
+    state = tasks;
     _saveToHive();
+  }
+
+  /// Reminder one hour before the deadline, cancelled once the task is completed.
+  void _syncReminder(String taskId) {
+    for (final task in state.where((task) => task.id == taskId)) {
+      NotificationService.updateTaskNotification(task);
+    }
   }
 
   void _saveToHive() {
